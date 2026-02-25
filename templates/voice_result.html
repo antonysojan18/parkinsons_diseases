@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Biomarker Analysis - NeuroGuard AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .voice-accent {
+            color: #818cf8;
+        }
+
+        .dashboard-grid-voice {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-nodes"></div>
+
+    <header class="main-header" style="padding-bottom: 2rem;">
+        <div class="container header-content"
+            style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 class="logo-title" style="margin: 0; font-size: 2rem;">
+                <span class="glow-text"
+                    style="{% if result == '1' %}color: var(--danger); text-shadow: 0 0 20px rgba(255, 77, 77, 0.4);{% else %}color: var(--success); text-shadow: 0 0 20px rgba(13, 240, 164, 0.4);{% endif %}">NeuroGuard</span>
+                Vocal Diagnostics
+            </h1>
+            <button class="btn"
+                style="background: rgba(0, 18, 28, 0.8); color: #818cf8; border: 1px solid rgba(129,140,248,0.2); transition: all 0.3s ease;"
+                onclick="window.location.href='/voice'"
+                onmouseover="this.style.background='rgba(129,140,248,0.1)'; this.style.borderColor='#818cf8'"
+                onmouseout="this.style.background='rgba(0, 18, 28, 0.8)'; this.style.borderColor='rgba(129,140,248,0.2)'">
+                <i class="fas fa-arrow-left"></i> New Vocal Analysis
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Diagnostic Status Banner -->
+        <section class="result-banner {% if result == '1' %}danger-banner{% else %}safe-banner{% endif %}">
+            <div class="banner-icon">
+                {% if result == '1' %}
+                <i class="fas fa-wave-square"></i>
+                {% else %}
+                <i class="fas fa-microphone"></i>
+                {% endif %}
+            </div>
+            <div class="banner-text">
+                <h2>
+                    {% if result == '1' %}
+                    Dysphonic Disruption Detected
+                    {% else %}
+                    Vocal Acoustics: Healthy
+                    {% endif %}
+                </h2>
+                <p>
+                    {% if result == '1' %}
+                    The vocal biometrics indicate significant fundamental frequency shifts and amplitude deviations
+                    (Jitter/Shimmer) commonly associated with the early onset of Parkinson's Disease.
+                    {% else %}
+                    The acoustic analysis returned optimal values for Harmonic-to-Noise Ratio (HNR) and standard jitter
+                    variations. Your speech profile denotes healthy neuro-muscular control over the glottis.
+                    {% endif %}
+                </p>
+            </div>
+        </section>
+
+        <!-- Explainable AI (XAI) Section -->
+        <section class="xai-section mt-4"
+            style="background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border-glass); border-left: 4px solid #818cf8; border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+            <h3 style="color: #818cf8; margin-bottom: 1rem; font-size: 1.4rem;"><i class="fas fa-lightbulb"
+                    style="margin-right: 10px;"></i> Explainable AI (XAI) Insight</h3>
+            <div style="margin-top: 0.5rem;">
+                {% if result == '1' %}
+                <strong style="color: var(--text-white); font-size: 1.1rem; display: block; margin-bottom: 0.8rem;">Why
+                    did the AI
+                    flag this?</strong>
+                <ul
+                    style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; padding-left: 1.2rem; margin: 0;">
+                    <li><strong style="color: var(--text-white);">Uneven Pitch (Jitter):</strong> The pitch of your
+                        voice changes too
+                        quickly in ways that we usually can't hear.</li>
+                    <li><strong style="color: var(--text-white);">Uneven Volume (Shimmer):</strong> The loudness of your
+                        voice drops
+                        and rises unexpectedly in tiny amounts.</li>
+                    <li><strong style="color: var(--text-white);">Extra Noise:</strong> There is more breathy or raspy
+                        noise mixed
+                        into your sound than usual.</li>
+                    <li><strong style="color: var(--text-white);">Vocal Muscle Stiffness:</strong> These small changes
+                        together point
+                        to muscle stiffness in your throat, a common early sign of Parkinson's.</li>
+                </ul>
+                {% else %}
+                <strong style="color: var(--text-white); font-size: 1.1rem; display: block; margin-bottom: 0.8rem;">Why
+                    is this
+                    considered healthy?</strong>
+                <ul
+                    style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; padding-left: 1.2rem; margin: 0;">
+                    <li><strong style="color: var(--text-white);">Steady Pitch:</strong> The AI measured your voice
+                        pitch and found
+                        it to be very stable and continuous.</li>
+                    <li><strong style="color: var(--text-white);">Even Volume:</strong> The loudness of your sound stays
+                        steady
+                        without sudden unexpected drops.</li>
+                    <li><strong style="color: var(--text-white);">Clear Sound:</strong> Your voice sounds strong and
+                        clean, without
+                        any extra breathiness or forced noise.</li>
+                    <li><strong style="color: var(--text-white);">Relaxed Voice Muscles:</strong> This proves that the
+                        muscles
+                        controlling your vocal cords are relaxed and working perfectly.</li>
+                </ul>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Voice Visualization Grid -->
+        <section class="charts-section mt-4">
+            <h3 class="section-title">Vocal Spectral Breakdown</h3>
+            <div class="dashboard-grid dashboard-grid-voice">
+
+                <div class="glass-card stat-card">
+                    <h4>Vocal Feature Distribution</h4>
+                    <p class="chart-desc">Blue: Healthy | Orange: Parkinson's Pattern Map</p>
+                    <img src="{{ url_for('static', filename='images/feature_distribution.png') }}"
+                        alt="Feature Histogram" class="dashboard-img">
+                </div>
+
+                <div class="glass-card stat-card">
+                    <h4>Algorithm Priority Matrix</h4>
+                    <p class="chart-desc">Machine Learning Weight Assignment</p>
+                    <img src="{{ url_for('static', filename='images/feature_importance.png') }}"
+                        alt="Feature Importance" class="dashboard-img">
+                </div>
+
+            </div>
+        </section>
+
+
+
+        <!-- Neurological Wellness Tips -->
+        <section class="tips-section mt-4 mb-4">
+            <h3 class="section-title">Acoustic & Motor Wellness Guide</h3>
+            <div class="tips-grid">
+                <div class="tip-card" style="border-top-color: #818cf8;">
+                    <div class="tip-icon" style="color: #818cf8;"><i class="fas fa-music"></i></div>
+                    <h4>Vocal Exercises</h4>
+                    <p>Daily vocal warm-ups and singing can help maintain glottal control and reduce dysphonia severity.
+                    </p>
+                </div>
+                <div class="tip-card" style="border-top-color: #818cf8;">
+                    <div class="tip-icon" style="color: #818cf8;"><i class="fas fa-apple-alt"></i></div>
+                    <h4>Antioxidant Fuel</h4>
+                    <p>Ensure a diet high in Omega-3 to protect the basal ganglia neurons governing vocal cords.</p>
+                </div>
+            </div>
+        </section>
+
+        <div style="text-align: center; margin: 3rem 0;">
+            <button class="btn"
+                style="background: rgba(0, 18, 28, 0.8); color: #818cf8; border: 1px solid rgba(129,140,248,0.2); transition: all 0.3s ease; padding: 1rem 3rem; font-size: 1.2rem; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);"
+                onclick="window.location.href='/'"
+                onmouseover="this.style.background='rgba(129,140,248,0.1)'; this.style.borderColor='#818cf8'; this.style.transform='translateY(-3px)';"
+                onmouseout="this.style.background='rgba(0, 18, 28, 0.8)'; this.style.borderColor='rgba(129,140,248,0.2)'; this.style.transform='translateY(0)';">
+                <i class="fas fa-home"></i> Return to Main Lobby
+            </button>
+        </div>
+    </main>
+</body>
+
+</html>

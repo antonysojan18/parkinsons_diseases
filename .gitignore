@@ -1,0 +1,6 @@
+balaenv/
+__pycache__/
+*.pyc
+~$*.docx
+*.env
+.env

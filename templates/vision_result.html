@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwriting CNN Analysis - NeuroGuard AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .vision-accent {
+            color: #0df0a4;
+        }
+
+        .dashboard-grid-vision {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        @media(max-width: 900px) {
+            .dashboard-grid-vision {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-nodes"></div>
+
+    <header class="main-header" style="padding-bottom: 2rem;">
+        <div class="container header-content"
+            style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 class="logo-title" style="margin: 0; font-size: 2rem;">
+                <span class="glow-text"
+                    style="{% if result == '1' %}color: var(--danger); text-shadow: 0 0 20px rgba(255, 77, 77, 0.4);{% else %}color: var(--success); text-shadow: 0 0 20px rgba(13, 240, 164, 0.4);{% endif %}">NeuroGuard</span>
+                Handwriting
+                Intel
+            </h1>
+            <button class="btn"
+                style="background: rgba(0, 18, 28, 0.8); color: #0df0a4; border: 1px solid rgba(13,240,164,0.2); transition: all 0.3s ease;"
+                onclick="window.location.href='/vision'"
+                onmouseover="this.style.background='rgba(13,240,164,0.1)'; this.style.borderColor='#0df0a4'"
+                onmouseout="this.style.background='rgba(0, 18, 28, 0.8)'; this.style.borderColor='rgba(13,240,164,0.2)'">
+                <i class="fas fa-arrow-left"></i> New Handwriting Analysis
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Diagnostic Status Banner -->
+        <section class="result-banner {% if result == '1' %}danger-banner{% else %}safe-banner{% endif %}">
+            <div class="banner-icon">
+                {% if result == '1' %}
+                <i class="fas fa-pen-square"></i>
+                {% else %}
+                <i class="fas fa-check-double"></i>
+                {% endif %}
+            </div>
+            <div class="banner-text">
+                <h2>
+                    {% if result == '1' %}
+                    Micrographia/Tremor Pattern Detected
+                    {% else %}
+                    Smooth Handwriting Function
+                    {% endif %}
+                </h2>
+                <p>
+                    {% if result == '1' %}
+                    The CNN vision layer, STAF-Net, highlighted high-frequency edge artifacts in the drawn spiral/wave
+                    (Tremor Density Index: <b>{{val}}</b>). This irregularity corresponds to motor disruption linked to
+                    Parkinson's.
+                    {% else %}
+                    The CNN confirms stable stroke mechanics (Tremor Density Index: <b
+                        style="color: var(--success);">{{val}}</b>). The lines exhibit smooth curvature, reflective of
+                    intact basal ganglia-motor coordination.
+                    {% endif %}
+                </p>
+            </div>
+        </section>
+
+        <!-- Explainable AI (XAI) Section -->
+        <section class="xai-section mt-4"
+            style="background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border-glass); border-left: 4px solid #0df0a4; border-radius: 16px; padding: 2rem; margin-bottom: 2rem;">
+            <h3 style="color: #0df0a4; margin-bottom: 1rem; font-size: 1.4rem;"><i class="fas fa-lightbulb"
+                    style="margin-right: 10px;"></i> Explainable AI (XAI) Insight</h3>
+            <div style="margin-top: 0.5rem;">
+                {% if result == '1' %}
+                <strong style="color: var(--text-white); font-size: 1.1rem; display: block; margin-bottom: 0.8rem;">Why
+                    did the AI
+                    flag this?</strong>
+                <ul
+                    style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; padding-left: 1.2rem; margin: 0;">
+                    <li><strong style="color: var(--text-white);">Hidden Tremors Caught:</strong> The AI saw tiny
+                        wiggles in your
+                        lines that are hard for a person to see.</li>
+                    <li><strong style="color: var(--text-white);">Uneven Edges:</strong> Instead of being smooth, the
+                        ink has a lot
+                        of sharp, jagged edges.</li>
+                    <li><strong style="color: var(--text-white);">Smaller Drawing Size:</strong> The lines get smaller
+                        as you draw,
+                        which is an early sign called "micrographia".</li>
+                    <li><strong style="color: var(--text-white);">Muscle Stiffness Sign:</strong> This pattern means
+                        there might be
+                        muscle stiffness affecting your hand movement.</li>
+                </ul>
+                {% else %}
+                <strong style="color: var(--text-white); font-size: 1.1rem; display: block; margin-bottom: 0.8rem;">Why
+                    is this
+                    considered healthy?</strong>
+                <ul
+                    style="color: var(--text-muted); font-size: 1.05rem; line-height: 1.8; padding-left: 1.2rem; margin: 0;">
+                    <li><strong style="color: var(--text-white);">Smooth Lines:</strong> The AI looked at the shape of
+                        your drawing
+                        and found the lines to be smooth and steady.</li>
+                    <li><strong style="color: var(--text-white);">No Hidden Tremors:</strong> There are almost no tiny
+                        wiggles or
+                        sudden stops in the ink.</li>
+                    <li><strong style="color: var(--text-white);">Clean Edges:</strong> The drawn shape has clean edges,
+                        without any
+                        jaggedness.</li>
+                    <li><strong style="color: var(--text-white);">Healthy Hand Control:</strong> This means you have
+                        strong, normal
+                        control over your hand muscles.</li>
+                </ul>
+                {% endif %}
+            </div>
+        </section>
+
+        <!-- Vision Neural Network Output -->
+        <section class="charts-section mt-4">
+            <h3 class="section-title" style="color: #0df0a4; border-bottom-color: rgba(13,240,164,0.2);">CNN & Stroke
+                Extraction Logic</h3>
+            <div class="dashboard-grid dashboard-grid-vision">
+
+                <div class="glass-card stat-card" style="border-top-color: #0df0a4;">
+                    <h4>Motor Symptom Visuals</h4>
+                    <p class="chart-desc">Baseline comparisons for drawing tremors.</p>
+                    <img src="{{ url_for('static', filename='images/handwriting_analysis.png') }}"
+                        alt="Handwriting Analysis" class="dashboard-img">
+                </div>
+
+                <div class="glass-card stat-card" style="border-top-color: #0df0a4;">
+                    <h4>STAF-Net Training Curve</h4>
+                    <p class="chart-desc">Accuracies for Spatial Image Pattern</p>
+                    <div class="dark-img-bg">
+                        <img src="{{ url_for('static', filename='images/training_history.png') }}"
+                            alt="Training History" class="dashboard-img">
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card" style="border-top-color: #0df0a4;">
+                    <h4>Model Output Benchmarks</h4>
+                    <p class="chart-desc">SVM vs our Visual Matrix (STAF-Net)</p>
+                    <img src="{{ url_for('static', filename='images/accuracy_comparison.png') }}"
+                        alt="Accuracy Comparison" class="dashboard-img">
+                </div>
+
+            </div>
+        </section>
+
+
+
+        <!-- Neurological Wellness Tips -->
+        <section class="tips-section mt-4 mb-4">
+            <h3 class="section-title" style="color: #0df0a4; border-bottom-color: rgba(13,240,164,0.2);">Motor
+                Coordination Tips</h3>
+            <div class="tips-grid">
+                <div class="tip-card" style="border-top-color: #0df0a4;">
+                    <div class="tip-icon" style="color: #0df0a4;"><i class="fas fa-running"></i></div>
+                    <h4>Gross & Fine Motor Practice</h4>
+                    <p>Combine activities like Tai Chi for balance, with calligraphy or drawing to maintain fine
+                        neural-motor connections.</p>
+                </div>
+                <div class="tip-card" style="border-top-color: #0df0a4;">
+                    <div class="tip-icon" style="color: #0df0a4;"><i class="fas fa-bed"></i></div>
+                    <h4>Deep Rest Cycles</h4>
+                    <p>Muscle repair and memory consolidation happen in REM sleep. Limit toxins to improve sleep
+                        efficacy.</p>
+                </div>
+                <div class="tip-card" style="border-top-color: #0df0a4;">
+                    <div class="tip-icon" style="color: #0df0a4;"><i class="fas fa-brain"></i></div>
+                    <h4>Strategic Cognitive Play</h4>
+                    <p>Activities requiring spatial reasoning (like chess) aid in preserving cortico-basal connections.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <div style="text-align: center; margin: 3rem 0;">
+            <button class="btn"
+                style="background: rgba(0, 18, 28, 0.8); color: #0df0a4; border: 1px solid rgba(13,240,164,0.2); transition: all 0.3s ease; padding: 1rem 3rem; font-size: 1.2rem; border-radius: 12px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);"
+                onclick="window.location.href='/'"
+                onmouseover="this.style.background='rgba(13,240,164,0.1)'; this.style.borderColor='#0df0a4'; this.style.transform='translateY(-3px)';"
+                onmouseout="this.style.background='rgba(0, 18, 28, 0.8)'; this.style.borderColor='rgba(13,240,164,0.2)'; this.style.transform='translateY(0)';">
+                <i class="fas fa-home"></i> Return to Main Lobby
+            </button>
+        </div>
+    </main>
+</body>
+
+</html>

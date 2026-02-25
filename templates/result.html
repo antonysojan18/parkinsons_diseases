@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroGuard AI - Diagnostic Result Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="bg-nodes"></div>
+
+    <header class="main-header" style="padding-bottom: 2rem;">
+        <div class="container header-content"
+            style="display: flex; justify-content: space-between; align-items: center;">
+            <h1 class="logo-title" style="margin: 0; font-size: 2rem;">
+                <span class="glow-text">NeuroGuard</span> AI Dashboard
+            </h1>
+            <button class="btn btn-secondary" onclick="window.location.href='/'">
+                <i class="fas fa-arrow-left"></i> New Analysis
+            </button>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Diagnostic Status Banner -->
+        <section class="result-banner {% if result == '1' %}danger-banner{% else %}safe-banner{% endif %}">
+            <div class="banner-icon">
+                {% if result == '1' %}
+                <i class="fas fa-exclamation-triangle"></i>
+                {% else %}
+                <i class="fas fa-check-circle"></i>
+                {% endif %}
+            </div>
+            <div class="banner-text">
+                <h2>
+                    {% if result == '1' %}
+                    Anomalies Detected
+                    {% else %}
+                    Healthy Neurological State
+                    {% endif %}
+                </h2>
+                <p>
+                    {% if result == '1' %}
+                    {% if p_type == 'voice' %}
+                    The vocal biometrics indicate significant frequency and amplitude deviations (Jitter/Shimmer)
+                    normally associated with Parkinson's Disease.
+                    {% else %}
+                    The CNN vision analysis (STAF-Net) detected profound micro-tremors (Tremor Index: {{val}})
+                    consistent with motor control degradation.
+                    {% endif %}
+                    {% else %}
+                    {% if p_type == 'voice' %}
+                    The vocal biometrics (fundamental frequencies and noise ratios) display stable periodic geometry
+                    typical of a healthy individual.
+                    {% else %}
+                    The CNN vision analysis detected smooth, precise motor control (Tremor Index: {{val}}). No signs of
+                    micrographia.
+                    {% endif %}
+                    {% endif %}
+                </p>
+            </div>
+        </section>
+
+        <!-- Dynamic Visualization Grid -->
+        <section class="charts-section mt-4">
+            <h3 class="section-title">Deep Learning Graphical Breakdown</h3>
+            <div class="dashboard-grid">
+
+                {% if p_type == 'voice' %}
+                <div class="glass-card stat-card">
+                    <h4>Vocal Feature Distribution</h4>
+                    <p class="chart-desc">Blue: Healthy | Orange: Parkinson's</p>
+                    <img src="{{ url_for('static', filename='images/feature_distribution.png') }}"
+                        alt="Feature Histogram" class="dashboard-img">
+                </div>
+
+                <div class="glass-card stat-card">
+                    <h4>Algorithm Decision Matrix</h4>
+                    <p class="chart-desc">Feature Impact on Current Prediction</p>
+                    <img src="{{ url_for('static', filename='images/feature_importance.png') }}"
+                        alt="Feature Importance" class="dashboard-img">
+                </div>
+                {% endif %}
+
+                {% if p_type == 'vision' %}
+                <div class="glass-card stat-card">
+                    <h4>Motor Symptom Analysis</h4>
+                    <p class="chart-desc">Handwriting/Drawing micro-tremor detection</p>
+                    <img src="{{ url_for('static', filename='images/handwriting_analysis.png') }}"
+                        alt="Handwriting Analysis" class="dashboard-img">
+                </div>
+                {% endif %}
+
+                <div class="glass-card stat-card">
+                    <h4>STAF-Net Performance</h4>
+                    <p class="chart-desc">Diagnostic Accuracy Convergence</p>
+                    <div class="dark-img-bg">
+                        <img src="{{ url_for('static', filename='images/training_history.png') }}"
+                            alt="Training History" class="dashboard-img">
+                    </div>
+                </div>
+
+                <div class="glass-card stat-card">
+                    <h4>Model Comparison</h4>
+                    <p class="chart-desc">SVM vs STAF-Net (98.5% Accuracy)</p>
+                    <img src="{{ url_for('static', filename='images/accuracy_comparison.png') }}"
+                        alt="Accuracy Comparison" class="dashboard-img">
+                </div>
+            </div>
+        </section>
+
+        <!-- Neurological Wellness Tips -->
+        <section class="tips-section mt-4 mb-4">
+            <h3 class="section-title">Neurological Wellness Tips</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-apple-alt"></i></div>
+                    <h4>Antioxidant Diet</h4>
+                    <p>Incorporate berries, leafy greens, and Omega-3 rich foods to protect neuronal pathways from
+                        oxidative stress.</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-running"></i></div>
+                    <h4>Neuro-Motor Activity</h4>
+                    <p>Engage in complex, rhythmic exercises like Tai Chi or cycling which promote dopamine production
+                        and synaptic plasticity.</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-bed"></i></div>
+                    <h4>Metabolic Clearance</h4>
+                    <p>Maintain strictly regulated REM sleep cycles to enhance the glymphatic system's removal of
+                        neurotoxins.</p>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-icon"><i class="fas fa-brain"></i></div>
+                    <h4>Cognitive Engagement</h4>
+                    <p>Perform novel, engaging cognitive tasks (like learning a new language or instrument) to build
+                        cognitive reserve.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+</body>
+
+</html>
