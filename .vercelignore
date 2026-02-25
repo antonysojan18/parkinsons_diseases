@@ -1,0 +1,15 @@
+balaenv/
+dataset/
+.git/
+.gitignore
+*.docx
+*.pdf
+~$*.docx
+run.bat
+create_csv.py
+model_trainer.py
+visualizer.py
+test_otsu.py
+test_blur.py
+*.pyc
+__pycache__/

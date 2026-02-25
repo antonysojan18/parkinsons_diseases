@@ -1,12 +1,36 @@
 from flask import Flask, render_template, request, jsonify
 import pickle
 import numpy as np
+import csv
+import urllib.request
 import os
-import cv2
 import base64
 from io import BytesIO
-from PIL import Image
-import pandas as pd
+from PIL import Image, ImageFilter
+
+if not hasattr(Image, 'Resampling'):
+    Resampling = Image
+else:
+    Resampling = Image.Resampling
+
+def otsu_threshold(gray_img):
+    hist, _ = np.histogram(gray_img.flatten(), bins=256, range=(0, 256))
+    hist_norm = hist.astype(float) / hist.sum()
+    
+    Q = hist_norm.cumsum()
+    bins = np.arange(256)
+    
+    p1 = Q
+    p2 = 1.0 - p1
+    
+    p1 = np.where(p1 == 0, np.finfo(float).eps, p1)
+    p2 = np.where(p2 == 0, np.finfo(float).eps, p2)
+    
+    mean1 = (bins * hist_norm).cumsum() / p1
+    mean2 = ((bins * hist_norm).sum() - mean1 * p1) / p2
+    
+    variance12 = p1 * p2 * (mean1 - mean2) ** 2
+    return np.argmax(variance12)
 
 app = Flask(__name__)
 
@@ -76,12 +100,21 @@ def predict():
 def get_dataset():
     url = "https://archive.ics.uci.edu/ml/machine-learning-databases/parkinsons/parkinsons.data"
     try:
-        df = pd.read_csv(url)
-        # Select first 100 rows and relevant columns
-        sample_df = df.head(100)
-        # Convert to list of dicts
-        data_list = sample_df.to_dict(orient='records')
-        return jsonify(data_list)
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req) as response:
+            lines = [line.decode('utf-8') for line in response.readlines()]
+            reader = csv.DictReader(lines)
+            data_list = []
+            for i, row in enumerate(reader):
+                if i >= 100:
+                    break
+                for k, v in row.items():
+                    try:
+                        row[k] = float(v)
+                    except ValueError:
+                        pass
+                data_list.append(row)
+            return jsonify(data_list)
     except Exception as e:
         # Fallback synthetic data
         data_list = []
@@ -115,9 +148,13 @@ def predict_image():
         
         # Evaluate using the trained ML vision model
         if vision_model is not None:
-            gray_ml = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
-            gray_ml = cv2.resize(gray_ml, (128, 128))
-            _, binary_ml = cv2.threshold(gray_ml, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+            gray_img = img.convert('L')
+            gray_img = gray_img.resize((128, 128), resample=Resampling.BILINEAR)
+            gray_ml = np.array(gray_img)
+            
+            thresh = otsu_threshold(gray_ml)
+            binary_ml = np.where(gray_ml <= thresh, 255, 0).astype(np.uint8)
+            
             input_features = binary_ml.flatten()
             prediction = vision_model.predict([input_features])[0]
             
@@ -128,12 +165,19 @@ def predict_image():
                 tremor_density = round(np.random.uniform(0.12, 0.28), 4)
         else:
             # Fallback older threshold logic
-            gray = cv2.cvtColor(img_np, cv2.COLOR_RGB2GRAY)
-            gray = cv2.resize(gray, (256, 256))
-            _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-            smoothed = cv2.GaussianBlur(binary, (15, 15), 0)
-            _, ideal_trajectory = cv2.threshold(smoothed, 127, 255, cv2.THRESH_BINARY)
-            deviation_map = cv2.bitwise_xor(binary, ideal_trajectory)
+            gray_img = img.convert('L')
+            gray_img = gray_img.resize((256, 256), resample=Resampling.BILINEAR)
+            gray = np.array(gray_img)
+            
+            thresh = otsu_threshold(gray)
+            binary = np.where(gray <= thresh, 255, 0).astype(np.uint8)
+            
+            pil_binary = Image.fromarray(binary)
+            smoothed_pil = pil_binary.filter(ImageFilter.GaussianBlur(radius=2.6))
+            smoothed = np.array(smoothed_pil)
+            
+            ideal_trajectory = np.where(smoothed > 127, 255, 0).astype(np.uint8)
+            deviation_map = np.bitwise_xor(binary, ideal_trajectory)
             
             total_ink_pixels = np.sum(binary > 0)
             if total_ink_pixels == 0:
